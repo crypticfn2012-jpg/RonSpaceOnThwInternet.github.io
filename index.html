@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RON'S EVERYTHING HUB V2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Caveat:wght@400;600&family=JetBrains+Mono&family=Syne:wght@800&family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@200;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+:root {
+    --accent: #ff0000;
+    --glass: rgba(10, 12, 18, 0.75);
+    --border: rgba(255, 255, 255, 0.12);
+    --font-main: 'Outfit', sans-serif;
+    --radius-card: 24px;
+    --radius-btn: 12px;
+    --t-case: none;
+    --l-space: 0px;
+}
+
+body{
+  font-family: var(--font-main);
+  overflow:hidden;
+  color:#fff;
+  cursor:none;
+  background: #03050a;
+  height: 100vh;
+  transition: all 0.4s ease;
+}
+
+#entry-gate {
+    position: fixed; inset: 0; z-index: 1000;
+    background: #000; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; cursor: pointer; transition: opacity 0.8s ease;
+}
+#entry-gate.hide { opacity: 0; pointer-events: none; }
+#entry-gate h2 { font-weight: 800; font-size: 1.2rem; letter-spacing: 10px; color: #fff; text-transform: uppercase; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.2; } }
+
+.bg{
+  position:fixed;inset:-5%;z-index:-5;
+  background:url('https://img.freepik.com/premium-photo/solitary-retro-yellow-camper-van-parked-serene-mountain-peak-twilight_127746-7745.jpg') center/cover no-repeat;
+  filter: brightness(0.25) saturate(0.6) blur(2px);
+  animation: bgMove 40s infinite alternate;
+}
+@keyframes bgMove { from { transform: scale(1); } to { transform: scale(1.1) rotate(1deg); } }
+
+.rain { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.drop { position: absolute; background: rgba(255,255,255,0.12); width: 1px; animation: fall linear infinite; }
+@keyframes fall { to { transform: translateY(110vh); } }
+
+.card{
+  position:fixed;top:50%;left:50%; transform:translate(-50%,-50%);
+  width:min(385px,90vw); padding:35px 25px; border-radius: var(--radius-card);
+  background: var(--glass); backdrop-filter:blur(30px) saturate(1.2);
+  border: 1px solid var(--border);
+  box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+  text-align:center; z-index:10;
+  transition: all 0.5s ease;
+}
+
+.av-wrap { position: relative; display: inline-block; margin-bottom: 15px; z-index: 2; }
+.av { width: 105px; height: 105px; border-radius: 50%; border: 2px solid var(--accent); padding: 4px; object-fit: cover; transition: all 0.5s ease; }
+
+h1 { 
+    font-size: 36px; 
+    font-weight: 800; 
+    letter-spacing: var(--l-space); 
+    text-transform: var(--t-case); 
+    margin-bottom: 2px; 
+    transition: all 0.4s ease;
+}
+.sub { font-family: 'Caveat', cursive; font-size: 18px; color: rgba(255,255,255,0.5); margin-bottom: 15px; height: 24px; }
+
+.visitors { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.3); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+#visCount { color: var(--accent); transition: color 0.5s ease; }
+
+.badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 20px; }
+.badge { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+
+.divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 15px 0; }
+
+.links { display: flex; flex-direction: column; gap: 8px; }
+.link {
+    display: flex; align-items: center; justify-content: center; padding: 11px 16px; 
+    border-radius: var(--radius-btn);
+    text-decoration: none; color: #fff; font-weight: 600; font-size: 13px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    text-transform: var(--t-case);
+    letter-spacing: var(--l-space);
+}
+.link:hover { transform: translateY(-3px); background: rgba(255,255,255,0.12); border-color: var(--accent); }
+
+.player-panel {
+  position: fixed; bottom: 25px; left: 25px; z-index: 200;
+  width: 280px; padding: 18px; border-radius: 20px;
+  background: rgba(5,8,15,0.9); backdrop-filter: blur(20px);
+  border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.p-top { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+.p-art { width: 45px; height: 45px; border-radius: 8px; overflow: hidden; background: #000; }
+.p-info { flex: 1; min-width: 0; }
+.p-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-artist { font-size: 11px; opacity: 0.5; font-family: 'Caveat', cursive; }
+
+.p-progress { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 10px 0; cursor: pointer; }
+.p-fill { height: 100%; background: var(--accent); width: 0%; border-radius: 2px; transition: background 0.5s ease; }
+
+.p-controls { display: flex; align-items: center; justify-content: center; gap: 20px; }
+.play-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+
+.vol-container { display: flex; align-items: center; gap: 8px; margin-top: 10px; opacity: 0.6; }
+input[type=range] { flex: 1; height: 2px; -webkit-appearance: none; background: rgba(255,255,255,0.2); outline: none; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+
+.rain-toggle { background: none; border: none; color: rgba(255,255,255,0.4); font-size: 10px; cursor: pointer; margin-top: 10px; width: 100%; text-align: left; font-family: 'JetBrains Mono'; }
+.rain-toggle.on { color: var(--accent); }
+
+.theme-picker {
+    position: fixed; bottom: 25px; right: 25px; z-index: 200;
+    display: flex; gap: 10px; background: rgba(0,0,0,0.6); padding: 12px;
+    border-radius: 50px; border: 1px solid var(--border); backdrop-filter: blur(10px);
+}
+.theme-btn {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer; transition: transform 0.2s ease;
+}
+.theme-btn:hover { transform: scale(1.3); }
+
+#cursor {
+  position: fixed; width: 14px; height: 14px; border-radius: 50%; background: #fff;
+  mix-blend-mode: difference; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%);
+}
+@media(pointer:coarse){#cursor{display:none}}
+</style>
+</head>
+<body id="mainBody">
+
+<div id="entry-gate" onclick="startApp()">
+    <h2>[ CLICK TO ENTER ]</h2>
+</div>
+
+<div class="bg"></div>
+<div id="cursor"></div>
+<div class="rain" id="rain"></div>
+
+<div class="card">
+  <div class="av-wrap">
+    <video class="av" id="av-border" autoplay loop muted playsinline>
+      <source src="https://media.tenor.com/MOthAbbtUhIAAAPo/dexter-morgan-edit-dexter-edit.mp4" type="video/mp4">
+    </video>
+  </div>
+  
+  <h1 id="userName">Ron</h1>
+  <p class="sub"><span id="typedText"></span></p>
+  
+  <div class="visitors"><span id="visCount">0</span> VISITORS</div>
+  
+  <div class="badges">
+    <span class="badge">🚐 Camper Life</span>
+    <span class="badge">⌨️ HTML Dev</span>
+    <span class="badge">🌲 Outdoors</span>
+    <span class="badge">🩸 Dexter</span>
+  </div>
+  
+  <div class="divider"></div>
+  
+  <div class="links">
+    <a href="https://discord.gg/a9C3yrTnqF" class="link" target="_blank">OGFN Server</a>
+    <a href="https://discord.gg/Jku2KJZ8yR" class="link" target="_blank">Coding Server</a>
+    <a href="https://www.youtube.com/@ronsogfncentre" class="link" target="_blank">My YouTube</a>
+    <a href="https://www.tiktok.com/@r0n_0132" class="link" target="_blank">My Tiktok</a>
+    <a href="https://ronsportfolio-ivory.vercel.app/" class="link" target="_blank">My Portfolio</a>
+  </div>
+</div>
+
+<div class="player-panel">
+  <div class="p-top">
+    <div class="p-art"><img id="songArt" src="PromQueen.png" style="width:100%;height:100%;object-fit:cover;"></div>
+    <div class="p-info">
+      <div class="p-title" id="songTitle">Prom Queen</div>
+      <div class="p-artist" id="songArtist">Beach Bunny</div>
+    </div>
+  </div>
+  
+  <div class="p-progress" id="pProg" onclick="seek(event)"><div class="p-fill" id="pFill"></div></div>
+  
+  <div class="p-controls">
+    <button class="play-btn" id="playBtn">⏸</button>
+    <button class="play-btn" onclick="nextSong()">⏭</button>
+  </div>
+  
+  <div class="vol-container">
+    <span style="font-size: 10px;">🔈</span>
+    <input type="range" id="volSlider" min="0" max="1" step="0.01" value="0.5">
+  </div>
+  
+  <button class="rain-toggle" id="rainToggle">STORM AUDIO: OFF</button>
+  <audio id="audio" loop></audio>
+</div>
+
+<div class="theme-picker">
+    <div class="theme-btn" style="background: #ff0000;" title="Vampire" onclick="setTheme('vampire')"></div>
+    <div class="theme-btn" style="background: #8b0000;" title="Crimson" onclick="setTheme('crimson')"></div>
+    <div class="theme-btn" style="background: #0077ff;" title="Midnight" onclick="setTheme('midnight')"></div>
+    <div class="theme-btn" style="background: #1a2a6c;" title="Deep Sea" onclick="setTheme('deepsea')"></div>
+    <div class="theme-btn" style="background: #00ff88;" title="Forest" onclick="setTheme('forest')"></div>
+    <div class="theme-btn" style="background: #ff00ff;" title="Cyber" onclick="setTheme('cyber')"></div>
+    <div class="theme-btn" style="background: #00f2ff;" title="Tokyo" onclick="setTheme('tokyo')"></div>
+    <div class="theme-btn" style="background: #ffffff;" title="Ghost" onclick="setTheme('ghost')"></div>
+    <div class="theme-btn" style="background: #ffcc00;" title="Gold" onclick="setTheme('gold')"></div>
+</div>
+
+<script>
+
+const audio = document.getElementById('audio');
+const playlist = [
+    { title: "Prom Queen", artist: "Beach Bunny", cover: "PromQueen.png", file: "promqueen.mp3" },
+    { title: "School Rooftop", artist: "Hisohkah + WMD", cover: "schoolrooftop.png", file: "schoolrooftop.mp3" }
+];
+let currentSongIdx = 0;
+
+function loadSong(index) {
+    const song = playlist[index];
+    audio.src = song.file;
+    document.getElementById('songTitle').textContent = song.title;
+    document.getElementById('songArtist').textContent = song.artist;
+    document.getElementById('songArt').src = song.cover;
+}
+loadSong(currentSongIdx);
+
+function nextSong() {
+    currentSongIdx = (currentSongIdx + 1) % playlist.length;
+    loadSong(currentSongIdx);
+    audio.play();
+    document.getElementById('playBtn').textContent = '⏸';
+}
+
+function seek(e) {
+    const percent = e.offsetX / document.getElementById('pProg').offsetWidth;
+    audio.currentTime = percent * audio.duration;
+}
+
+
+function updateCounter() {
+    let count = localStorage.getItem('ronVisitCount') || 0;
+    count = parseInt(count) + 1;
+    localStorage.setItem('ronVisitCount', count);
+    document.getElementById('visCount').textContent = count.toLocaleString();
+}
+
+function startApp() {
+    document.getElementById('entry-gate').classList.add('hide');
+    audio.play();
+    type();
+    updateCounter();
+}
+
+
+const phrases = ['late nights & open roads', 'OGFN · Camper Builder', 'gooner til i die', 'Dexter is the best'];
+let pIdx = 0, cIdx = 0, isDel = false;
+function type() {
+    const cur = phrases[pIdx];
+    const el = document.getElementById('typedText');
+    el.textContent = isDel ? cur.slice(0, --cIdx) : cur.slice(0, ++cIdx);
+    if (!isDel && cIdx === cur.length) { isDel = true; setTimeout(type, 2000); }
+    else if (isDel && cIdx === 0) { isDel = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(type, 500); }
+    else setTimeout(type, isDel ? 50 : 100);
+}
+
+
+document.addEventListener('mousemove', e => {
+    const c = document.getElementById('cursor');
+    c.style.left = e.clientX + 'px';
+    c.style.top = e.clientY + 'px';
+});
+
+const rainBox = document.getElementById('rain');
+for(let i=0; i<85; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'drop';
+    drop.style.left = Math.random() * 100 + 'vw';
+    drop.style.height = (Math.random() * 20 + 15) + 'px';
+    drop.style.animationDuration = (Math.random() * 0.4 + 0.3) + 's';
+    drop.style.opacity = Math.random() * 0.3;
+    rainBox.appendChild(drop);
+}
+
+
+let rainCtx, rainGain, rainActive = false;
+function initRainAudio() {
+    rainCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const noiseBuffer = rainCtx.createBuffer(1, rainCtx.sampleRate * 2, rainCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
+    const source = rainCtx.createBufferSource();
+    source.buffer = noiseBuffer;
+    source.loop = true;
+    const filter = rainCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1000;
+    rainGain = rainCtx.createGain();
+    rainGain.gain.value = 0;
+    source.connect(filter);
+    filter.connect(rainGain);
+    rainGain.connect(rainCtx.destination);
+    source.start();
+}
+
+document.getElementById('rainToggle').onclick = function() {
+    if(!rainCtx) initRainAudio();
+    rainActive = !rainActive;
+    this.classList.toggle('on', rainActive);
+    this.textContent = rainActive ? 'STORM AUDIO: ON' : 'STORM AUDIO: OFF';
+    rainGain.gain.setTargetAtTime(rainActive ? 0.08 : 0, rainCtx.currentTime, 0.4);
+};
+
+
+const playBtn = document.getElementById('playBtn');
+playBtn.onclick = () => {
+    if(audio.paused) { audio.play(); playBtn.textContent = '⏸'; }
+    else { audio.pause(); playBtn.textContent = '▶'; }
+};
+audio.ontimeupdate = () => {
+    document.getElementById('pFill').style.width = (audio.currentTime / audio.duration * 100) + '%';
+};
+document.getElementById('volSlider').oninput = (e) => audio.volume = e.target.value;
+
+
+function setTheme(theme) {
+    const root = document.documentElement;
+    const body = document.getElementById('mainBody');
+    const configs = {
+        'vampire': { accent: '#660000', font: "'Syne', sans-serif", radiusCard: '2px', radiusBtn: '2px', case: 'uppercase', space: '5px' },
+        'crimson': { accent: '#FF0000', font: "'font', Times", radiusCard: '14px', radiusBtn: '6px', case: 'none', space: '+1px' },
+        'midnight': { accent: '#0077ff', font: "'Outfit', sans-serif", radiusCard: '40px', radiusBtn: '30px', case: 'none', space: '0px' },
+        'deepsea': { accent: '#324AB2', font: "'font', Times New Roman", radiusCard: '1px', radiusBtn: '2px', case: 'none', space: '0.01px' },
+        'forest': { accent: '#00ff88', font: "'JetBrains Mono', monospace", radiusCard: '0px', radiusBtn: '0px', case: 'none', space: '-0.5px' },
+        'cyber': { accent: '#ff00ff', font: "'Bebas Neue', sans-serif", radiusCard: '15px', radiusBtn: '4px', case: 'uppercase', space: '2px' },
+        'tokyo': { accent: '#00f2ff', font: "'Perpetua', sans-serif", radiusCard: '8px', radiusBtn: '20px', case: 'uppercase', space: '3px' },
+        'ghost': { accent: '#ffffff', font: "'Plus Jakarta Sans', sans-serif", radiusCard: '50px', radiusBtn: '50px', case: 'lowercase', space: '1px' },
+        'gold': { accent: '#ffcc00', font: "'Syne', sans-serif", radiusCard: '20px', radiusBtn: '12px', case: 'uppercase', space: '-1px' }
+    };
+    const c = configs[theme];
+    root.style.setProperty('--accent', c.accent);
+    root.style.setProperty('--font-main', c.font);
+    root.style.setProperty('--radius-card', c.radiusCard);
+    root.style.setProperty('--radius-btn', c.radiusBtn);
+    root.style.setProperty('--t-case', c.case);
+    root.style.setProperty('--l-space', c.space);
+    body.style.transform = (theme === 'cyber' || theme === 'tokyo') ? 'skewX(-0.5deg)' : 'none';
+}
+</script>
+</body>
+</html>
