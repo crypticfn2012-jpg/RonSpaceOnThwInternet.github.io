@@ -20,7 +20,6 @@
 
         body{ font-family: var(--font-main); overflow:hidden; color:#fff; cursor:none; background: #03050a; height: 100vh; }
 
-       
         .like-container {
             position: fixed; top: 20px; left: 20px; z-index: 500;
             background: var(--glass); border: 1px solid var(--border);
@@ -36,7 +35,6 @@
         .like-btn.liked { pointer-events: none; filter: grayscale(1); opacity: 0.5; }
         .like-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 800; color: var(--accent); }
 
-      
         .bubble {
             position: absolute; background: var(--accent); color: #fff;
             padding: 4px 10px; border-radius: 8px; font-size: 10px;
@@ -47,7 +45,6 @@
         }
         .show-bubble { opacity: 1; transform: translateY(0); }
 
-      
         .discord-wrap { position: fixed; top: 20px; right: 20px; z-index: 500; display: flex; flex-direction: column; align-items: flex-end; }
         .discord-widget {
             background: var(--glass); border: 1px solid var(--border);
@@ -66,7 +63,6 @@
         .dc-name { font-weight: 800; font-size: 12px; display: block; }
         .dc-status-text { font-size: 9px; opacity: 0.5; text-transform: uppercase; }
 
-      
         .player-container {
             position: fixed; bottom: 20px; left: 20px; z-index: 500;
             padding: 10px; border-radius: 15px; background: var(--glass);
@@ -93,7 +89,6 @@
         .vol-slider { width: 100%; height: 3px; -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 5px; margin-top: 5px; cursor: pointer; }
         .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 
-        
         .van-clock-container { position: fixed; bottom: -5px; left: 50%; transform: translateX(-50%); z-index: 400; display: flex; justify-content: center; }
         .van-svg { width: 120px; height: auto; filter: drop-shadow(0 0 10px var(--accent)); }
         .uk-time-display { 
@@ -110,7 +105,6 @@
         .theme-container:hover .theme-grid { opacity: 1; }
         .theme-btn { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
 
-     
         #entry-gate { position: fixed; inset: 0; z-index: 1000; background: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         #entry-gate.hide { opacity: 0; pointer-events: none; transition: 0.8s; }
         .enter-btn-text { 
@@ -122,7 +116,6 @@
             50% { opacity: 0.8; transform: scale(1.05); }
         }
 
-   
         .card{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:min(350px,90vw); padding:30px 20px; border-radius: var(--radius-card); background: var(--glass); backdrop-filter:blur(30px); border: 1px solid var(--border); text-align:center; z-index:10; transition: 0.5s; box-shadow: 0 40px 80px rgba(0,0,0,0.8); animation: pulse-border-wide 5s infinite alternate; }
         @keyframes pulse-border-wide { 0%, 100% { box-shadow: 0 40px 80px rgba(0,0,0,0.8); } 50% { box-shadow: 0 0 25px var(--accent); } }
         
@@ -241,7 +234,8 @@
 
 <script>
 const DISCORD_ID = "1433549145251123234"; 
-const NAMESPACE = "rons_space_v12";
+const NAMESPACE = "rons_space";
+const API_URL = `https://api.counterapi.dev/v1/${NAMESPACE}/likes`;
 
 const playlist = [
     { t: "Prom Queen", a: "Beach Bunny", c: "PromQueen.png", f: "promqueen.mp3" },
@@ -255,23 +249,36 @@ const playlist = [
     { t: "aquatic ambience", a: "scizzie", c: "aquatic ambience.png", f: "aquatic ambience.mp3" },
     { t: "End Of Beginning", a: "DJO", c: "End Of Beginning.png", f: "End Of Beginning.mp3" }
 ];
- 
 
 let sIdx = Math.floor(Math.random() * playlist.length); 
 let liked = localStorage.getItem(NAMESPACE + '_liked') === 'true';
-let likeCount = parseInt(localStorage.getItem(NAMESPACE + '_count')) || 0;
 
-document.getElementById('likeCount').innerText = likeCount;
+
+async function fetchGlobalLikes() {
+    try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        document.getElementById('likeCount').innerText = data.count || 0;
+    } catch (e) {
+        console.error("Counter fetch failed", e);
+    }
+}
+
 if(liked) document.getElementById('likeBtn').classList.add('liked');
 
-function handleLike() {
+async function handleLike() {
     if(!liked) {
-        likeCount++;
-        liked = true;
-        localStorage.setItem(NAMESPACE + '_liked', 'true');
-        localStorage.setItem(NAMESPACE + '_count', likeCount);
-        document.getElementById('likeCount').innerText = likeCount;
-        document.getElementById('likeBtn').classList.add('liked');
+        try {
+            const res = await fetch(`${API_URL}/up`);
+            const data = await res.json();
+            
+            liked = true;
+            localStorage.setItem(NAMESPACE + '_liked', 'true');
+            document.getElementById('likeCount').innerText = data.count;
+            document.getElementById('likeBtn').classList.add('liked');
+        } catch (e) {
+            console.error("Like update failed", e);
+        }
     }
 }
 
@@ -296,6 +303,7 @@ function startApp() {
     type();
     fetchDiscord();
     updateUKTime();
+    fetchGlobalLikes();
     setInterval(updateUKTime, 1000);
     
     setTimeout(() => {
@@ -369,6 +377,9 @@ function setTheme(t) {
     r.style.setProperty('--accent', cfg.a);
     r.style.setProperty('--font-main', cfg.f);
 }
+
+
+fetchGlobalLikes();
 </script>
 </body>
 </html>
